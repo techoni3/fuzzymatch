@@ -1,0 +1,9 @@
+version: '3'
+services:
+  fuzzymatch:
+    build: .
+    volumes:
+    - ".:/app"
+    container_name: fuzzymatch
+    ports:
+    - "8107:8107"
