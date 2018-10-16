@@ -29,7 +29,7 @@ class WordMatching:
         self.soundex = Soundex(3)  # for phonetic similarity
         self.algo_ref = {
             'levenshtein': levenshtein,
-            'c_levenshtein': editdistance,
+            'c_levenshtein': editdistance.eval,
             'lcs': lcs
         }
         self.load_corpus()

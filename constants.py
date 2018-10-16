@@ -1,0 +1,4 @@
+TOP_RESULT_COUNT = 25
+MIN_CHARS = 2
+
+MATCH_ALGO = 'levenshtein'
