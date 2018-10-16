@@ -1,5 +1,3 @@
-from utils import levenshtein, lcs, singleton
-# import editdistance
 from functools import lru_cache
 from fuzzy import Soundex
 from collections import defaultdict
@@ -7,6 +5,10 @@ import time
 import logging
 import sys
 import pickle
+import editdistance
+
+from utils import levenshtein, lcs, singleton
+from constants import TOP_RESULT_COUNT, MATCH_ALGO
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -25,6 +27,11 @@ class WordMatching:
         logger.info(f"initializing index for file {corpus_name}")
         self.file_name = corpus_name
         self.soundex = Soundex(3)  # for phonetic similarity
+        self.algo_ref = {
+            'levenshtein': levenshtein,
+            'c_levenshtein': editdistance,
+            'lcs': lcs
+        }
         self.load_corpus()
 
     def load_corpus(self):
@@ -55,18 +62,24 @@ class WordMatching:
         logger.info(f"index build up finished in {time.time()-start_time} seconds")
 
     @lru_cache(maxsize=64)
-    def top_matches(self, match_string, count=25):
+    def top_matches(
+        self, match_string, count=TOP_RESULT_COUNT):
         result_map = {}
         # match_string = match_string[:8]       # can be used to optimize long string assuming
                                                 # long strings will have errors only till
                                                 # first k(8) characters
         
         soundex_match = self.soundex_map[self.soundex(match_string)]
-        word_ngram = [match_string[x:x + 3] for x in range(len(match_string) - 2)]
+        if len(match_string) < 3:
+            word_ngram = [gram for gram in self.ngrams_map if match_string in gram]
+        else:
+            word_ngram = [match_string[x:x + 3] for x in range(len(match_string) - 2)]
         final_word_list = set(
             [word for ngram in word_ngram for word in self.ngrams_map[ngram]]
             ).union(soundex_match)
         for word in final_word_list:
+            result_map[word] = (
+                self.corpus_map[word], self.algo_ref[MATCH_ALGO](match_string, word))
             # result_map[word] = (self.corpus_map[word], lcs(match_string, word))   # longest common substring approach
             result_map[word] = (self.corpus_map[word], levenshtein(match_string, word))
             # result_map[word] = (
