@@ -18,6 +18,7 @@ class FuzzyMatch:
                 "data": []
             })
             return
+        word = ''.join(filter(lambda x: x.isalpha(), word))
         result = wm.top_matches(word)
         res.status = falcon.HTTP_200
         res.body = json.dumps({
