@@ -16,7 +16,7 @@ class FuzzyMatch:
         if not word or len(word) < MIN_CHARS:
             res.status = falcon.HTTP_400
             res.body = json.dumps({
-                "message": "Please enter atleast 3 characters to search",
+                "message": f"Please enter atleast {MIN_CHARS} characters to search",
                 "data": []
             })
             return
