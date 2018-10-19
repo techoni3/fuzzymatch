@@ -1,4 +1,5 @@
 from functools import lru_cache
+from constants import N__GRAM
 
 
 @lru_cache(maxsize=256)
@@ -14,7 +15,7 @@ def lcs(X, Y):
                 L[i][j] = L[i-1][j-1]+1
             else:
                 L[i][j] = max(L[i-1][j], L[i][j-1])
-    return L[m][n]
+    return -L[m][n]
 
 
 @lru_cache(maxsize=256)
@@ -56,3 +57,14 @@ def singleton(cls):
             instances[cls] = cls(*args, **kwargs)
         return instances[cls]
     return getinstance
+
+
+def generate_ngrams(word, n=N__GRAM, lpad=True, rpad=False):
+    word = f"{' '* (n-1) * lpad}{word}{' '* (n-1) * rpad}"
+    return [word[x:x + n] for x in range(len(word) - (n-1))]
+
+
+def ngrams_match(match, word, lpad=True, rpad=False):
+    match_grams = generate_ngrams(match, lpad=lpad, rpad=rpad)
+    word_grams = generate_ngrams(word, lpad=lpad, rpad=rpad)
+    return -len(set(match_grams).intersection(word_grams))

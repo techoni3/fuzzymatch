@@ -19,13 +19,13 @@ class FuzzyMatch:
                 "message": f"Please enter atleast {MIN_CHARS} characters to search",
                 "data": []
             })
-            return
-        result = wm.top_matches(word)
-        res.status = falcon.HTTP_200
-        res.body = json.dumps({
-            "message": "match successful.",
-            "data": [data[0] for data in result]
-        })
+        else:
+            result = wm.top_matches(word)
+            res.status = falcon.HTTP_200
+            res.body = json.dumps({
+                "message": "match successful.",
+                "data": [data[0] for data in result]
+            })
         return
 
 
